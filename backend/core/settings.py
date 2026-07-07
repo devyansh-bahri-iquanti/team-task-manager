@@ -40,7 +40,7 @@ INSTALLED_APPS = [
 
     # Third-party apps
     'rest_framework',
-    'rest_framework.authtoken', # For Token Auth later
+    'rest_framework.authtoken', 
     'corsheaders',              # To allow React to connect
     
     # Local apps
@@ -126,3 +126,10 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 CORS_ALLOW_ALL_ORIGINS = True # For development only
+
+# DRF Settings
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}

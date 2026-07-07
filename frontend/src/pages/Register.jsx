@@ -2,15 +2,15 @@ import { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 
-const Login = () => {
+const Register = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const { login } = useContext(AuthContext);
 
-  const handleLogin = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    const response = await fetch("http://127.0.0.1:8000/api/login/", {
+    const response = await fetch("http://127.0.0.1:8000/api/register/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
@@ -18,17 +18,17 @@ const Login = () => {
 
     const data = await response.json();
     if (response.ok) {
-      login(data.token);
+      login(data.token); // Save token and redirect
     } else {
-      setError(data.error || "Login failed");
+      setError("Failed to register. Username might exist.");
     }
   };
 
   return (
     <div>
-      <h2>Login</h2>
+      <h2>Register</h2>
       {error && <p style={{ color: "red" }}>{error}</p>}
-      <form onSubmit={handleLogin}>
+      <form onSubmit={handleRegister}>
         <input
           type="text"
           placeholder="Username"
@@ -47,12 +47,12 @@ const Login = () => {
         />
         <br />
         <br />
-        <button type="submit">Login</button>
+        <button type="submit">Register</button>
       </form>
       <p>
-        Don't have an account? <Link to="/register">Register</Link>
+        Already have an account? <Link to="/login">Login</Link>
       </p>
     </div>
   );
 };
-export default Login;
+export default Register;
