@@ -1,0 +1,9 @@
+.dashboard-container {
+  padding: 20px;
+  text-align: center;
+}
+
+.dashboard-title {
+  color: #2c3e50;
+  font-family: Arial, sans-serif;
+}

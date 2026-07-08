@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'corsheaders',              # To allow React to connect
     
     # Local apps
-    'api',
+    'task_manager',
 ]
 
 MIDDLEWARE = [

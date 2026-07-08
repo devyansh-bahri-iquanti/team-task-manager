@@ -10,8 +10,9 @@ import { useContext } from "react";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ProjectList from "./pages/ProjectList";
+import ProjectForm from "./pages/ProjectForm";
 
-// This component acts as a bouncer. If no token, redirect to login!
 const PrivateRoute = ({ children }) => {
   const { token } = useContext(AuthContext);
   return token ? children : <Navigate to="/login" />;
@@ -22,12 +23,28 @@ function App() {
     <Router>
       <AuthProvider>
         <Routes>
-          {/* Protected Route */}
+          {/* Protected Routes */}
           <Route
             path="/"
             element={
               <PrivateRoute>
                 <Dashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/projects"
+            element={
+              <PrivateRoute>
+                <ProjectList />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/projects/new"
+            element={
+              <PrivateRoute>
+                <ProjectForm />
               </PrivateRoute>
             }
           />
