@@ -41,7 +41,10 @@ const ProjectList = () => {
       <ul>
         {projects.map((project) => (
           <li key={project.id} style={{ margin: "10px 0" }}>
-            <strong>{project.name}</strong> - {project.description}
+            <Link to={`/projects/${project.id}`}>
+              <strong>{project.name}</strong>
+            </Link>{" "}
+            - {project.description}
             <button
               onClick={() => handleDelete(project.id)}
               style={{ marginLeft: "10px", color: "red" }}

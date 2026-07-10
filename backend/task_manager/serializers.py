@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Project
+from .models import Project, Task
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -26,3 +26,11 @@ class ProjectSerializer(serializers.ModelSerializer):
         model = Project
         fields = ['id', 'name', 'description', 'owner', 'created_date']
         read_only_fields = ['owner', 'created_date']
+
+class TaskSerializer(serializers.ModelSerializer):
+    assignee_name = serializers.ReadOnlyField(source='assigned_to.username')
+
+    class Meta:
+        model = Task
+        fields = '__all__'
+        read_only_fields = ['created_by', 'created_at']

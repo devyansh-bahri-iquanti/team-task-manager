@@ -11,7 +11,6 @@ const ProjectForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // We add 'try' so if anything crashes, it skips to the 'catch' block at the bottom
     try {
       const response = await fetch("http://127.0.0.1:8000/api/projects/", {
         method: "POST",
@@ -25,13 +24,12 @@ const ProjectForm = () => {
       if (response.ok) {
         navigate("/projects");
       } else {
-        // If Django sends a 400 or 500 error, we handle it here
-        const errorText = await response.text(); // Read as text first just in case it's HTML!
+        // If Django sends a 400 or 500 error, handle it here
+        const errorText = await response.text();
         console.log("Django Error:", errorText);
         alert("Backend Error: " + errorText);
       }
     } catch (error) {
-      // If the server is offline or React crashes, this catches it!
       console.error("React Crash:", error);
       alert(
         "Network Error: Is your Django server running? (" + error.message + ")",

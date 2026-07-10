@@ -12,6 +12,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProjectList from "./pages/ProjectList";
 import ProjectForm from "./pages/ProjectForm";
+import ProjectDetails from "./pages/ProjectDetails";
+import TaskForm from "./pages/TaskForm";
 
 const PrivateRoute = ({ children }) => {
   const { token } = useContext(AuthContext);
@@ -45,6 +47,30 @@ function App() {
             element={
               <PrivateRoute>
                 <ProjectForm />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/projects/:id"
+            element={
+              <PrivateRoute>
+                <ProjectDetails />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/projects/:projectId/tasks/new"
+            element={
+              <PrivateRoute>
+                <TaskForm />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/tasks/:taskId/edit"
+            element={
+              <PrivateRoute>
+                <TaskForm />
               </PrivateRoute>
             }
           />
