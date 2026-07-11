@@ -127,6 +127,19 @@ class TaskDetail(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def patch(self, request, pk):
+        task = Task.objects.get(pk=pk)
+        
+        if task.project.owner != request.user and task.created_by != request.user and task.assigned_to != request.user:
+            return Response({"error": "You do not have permission to modify this task."}, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = TaskSerializer(task, data=request.data, partial=True)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     def delete(self, request, pk):
         task = Task.objects.get(pk=pk)
         task.delete()
