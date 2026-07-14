@@ -44,9 +44,3 @@ class Comment(models.Model):
     def __str__(self):
         return f"Comment by {self.user.username} on {self.task.title}"
     
-
-# readme add for each day
-# authorisation not implemented for all things like delete (put post etc)
-# shouldn't be visible to all projects 
-# errors provide 500 error for some. put try catch for all
-# dont hardcode the localhost. put a key or smth (dev, qa)
