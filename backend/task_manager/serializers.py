@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Project, Task
+from .models import Project, Task, Comment
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -34,3 +34,11 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Task
         fields = '__all__'
         read_only_fields = ['created_by', 'created_at']
+
+class CommentSerializer(serializers.ModelSerializer):
+    author_name = serializers.ReadOnlyField(source='user.username')
+
+    class Meta:
+        model = Comment
+        fields = ['id', 'task', 'user', 'author_name', 'content', 'created_at']
+        read_only_fields = ['user', 'created_at']

@@ -10,17 +10,22 @@ const Register = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    const response = await fetch("http://127.0.0.1:8000/api/register/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
+    try {
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await fetch(`${API_URL}/register/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
 
-    const data = await response.json();
-    if (response.ok) {
-      login(data.token); // Save token and redirect
-    } else {
-      setError("Failed to register. Username might exist.");
+      const data = await response.json();
+      if (response.ok) {
+        login(data.token);
+      } else {
+        setError("Failed to register. Username might exist.");
+      }
+    } catch (error) {
+      setError("Network Error: Could not connect to the server.");
     }
   };
 

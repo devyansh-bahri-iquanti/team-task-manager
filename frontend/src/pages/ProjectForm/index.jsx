@@ -10,9 +10,9 @@ const ProjectForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/projects/", {
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await fetch(`${API_URL}/projects/`, {
         method: "POST",
         headers: {
           Authorization: `Token ${token}`,
@@ -24,16 +24,11 @@ const ProjectForm = () => {
       if (response.ok) {
         navigate("/projects");
       } else {
-        // If Django sends a 400 or 500 error, handle it here
-        const errorText = await response.text();
-        console.log("Django Error:", errorText);
-        alert("Backend Error: " + errorText);
+        const errorData = await response.json();
+        alert("Error: " + JSON.stringify(errorData));
       }
     } catch (error) {
-      console.error("React Crash:", error);
-      alert(
-        "Network Error: Is your Django server running? (" + error.message + ")",
-      );
+      alert("Network Error: Could not connect to the server.");
     }
   };
 

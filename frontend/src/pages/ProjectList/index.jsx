@@ -11,24 +11,34 @@ const ProjectList = () => {
   }, []);
 
   const fetchProjects = async () => {
-    const response = await fetch("http://127.0.0.1:8000/api/projects/", {
-      headers: { Authorization: `Token ${token}` },
-    });
-    if (response.ok) {
-      const data = await response.json();
-      setProjects(data);
+    try {
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await fetch(`${API_URL}/projects/`, {
+        headers: { Authorization: `Token ${token}` },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setProjects(data);
+      }
+    } catch (error) {
+      alert("Network Error: Failed to load projects.");
     }
   };
 
   const handleDelete = async (id) => {
-    const response = await fetch(`http://127.0.0.1:8000/api/projects/${id}/`, {
-      method: "DELETE",
-      headers: { Authorization: `Token ${token}` },
-    });
-    if (response.ok) {
-      fetchProjects(); // Refresh the list
-    } else {
-      alert("Failed to delete. Are you the owner?");
+    try {
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await fetch(`${API_URL}/projects/${id}/`, {
+        method: "DELETE",
+        headers: { Authorization: `Token ${token}` },
+      });
+      if (response.ok) {
+        fetchProjects();
+      } else {
+        alert("Failed to delete. Are you the owner?");
+      }
+    } catch (error) {
+      alert("Network Error: Could not connect to the server.");
     }
   };
 

@@ -23,19 +23,27 @@ const TaskForm = () => {
   }, []);
 
   const fetchUsers = async () => {
-    const res = await fetch("http://127.0.0.1:8000/api/users/", {
-      headers: { Authorization: `Token ${token}` },
-    });
-    if (res.ok) setUsers(await res.json());
+    try {
+      const res = await fetch(`${API_URL}/users/`, {
+        headers: { Authorization: `Token ${token}` },
+      });
+      if (res.ok) setUsers(await res.json());
+    } catch (error) {
+      console.error("Network error fetching users");
+    }
   };
 
   const fetchTaskData = async () => {
-    const res = await fetch(`http://127.0.0.1:8000/api/tasks/${taskId}/`, {
-      headers: { Authorization: `Token ${token}` },
-    });
-    if (res.ok) {
-      const data = await res.json();
-      setFormData({ ...data, assigned_to: data.assigned_to || "" });
+    try {
+      const res = await fetch(`${API_URL}/tasks/${taskId}/`, {
+        headers: { Authorization: `Token ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setFormData({ ...data, assigned_to: data.assigned_to || "" });
+      }
+    } catch (error) {
+      console.error("Network error fetching task data");
     }
   };
 
@@ -45,28 +53,29 @@ const TaskForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const url = taskId
-      ? `http://127.0.0.1:8000/api/tasks/${taskId}/`
-      : "http://127.0.0.1:8000/api/tasks/";
-    const method = taskId ? "PUT" : "POST";
+    try {
+      const url = taskId ? `${API_URL}/tasks/${taskId}/` : `${API_URL}/tasks/`;
+      const method = taskId ? "PUT" : "POST";
 
-    // Attach the project ID to the payload
-    const payload = { ...formData, project: projectId || formData.project };
+      const payload = { ...formData, project: projectId || formData.project };
 
-    const res = await fetch(url, {
-      method,
-      headers: {
-        Authorization: `Token ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+      const res = await fetch(url, {
+        method,
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
 
-    if (res.ok) {
-      navigate(`/projects/${payload.project}`); // Go back to project details
-    } else {
-      const err = await res.json();
-      alert("Error: " + JSON.stringify(err));
+      if (res.ok) {
+        navigate(`/projects/${payload.project}`);
+      } else {
+        const err = await res.json();
+        alert("Error: " + JSON.stringify(err));
+      }
+    } catch (error) {
+      alert("Network Error: Could not save task.");
     }
   };
 

@@ -10,17 +10,22 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const response = await fetch("http://127.0.0.1:8000/api/login/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
+    try {
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await fetch(`${API_URL}/login/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
 
-    const data = await response.json();
-    if (response.ok) {
-      login(data.token);
-    } else {
-      setError(data.error || "Login failed");
+      const data = await response.json();
+      if (response.ok) {
+        login(data.token);
+      } else {
+        setError(data.error || "Login failed");
+      }
+    } catch (error) {
+      setError("Network Error: Is the backend server running?");
     }
   };
 
