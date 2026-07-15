@@ -234,3 +234,29 @@ class CommentListCreate(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class DashboardStats(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            # 1. Count projects owned by the user
+            projects = Project.objects.filter(owner=request.user)
+            total_projects = projects.count()
+
+            # 2. Count tasks belonging to those projects
+            tasks = Task.objects.filter(project__owner=request.user)
+            total_tasks = tasks.count()
+            completed_tasks = tasks.filter(status='Completed').count()
+            pending_tasks = total_tasks - completed_tasks
+
+            # 3. Return the formatted data
+            return Response({
+                "total_projects": total_projects,
+                "total_tasks": total_tasks,
+                "completed_tasks": completed_tasks,
+                "pending_tasks": pending_tasks
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
