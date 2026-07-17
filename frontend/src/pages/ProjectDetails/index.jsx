@@ -61,12 +61,16 @@ const ProjectDetails = () => {
   };
 
   const deleteTask = async (taskId) => {
+    if (!window.confirm("Delete this task?")) return;
     try {
       const res = await fetch(`${API_URL}/tasks/${taskId}/`, {
         method: "DELETE",
         headers: { Authorization: `Token ${token}` },
       });
-      if (res.ok) fetchTasks();
+      if (res.ok) {
+        alert("Task deleted successfully.");
+        fetchTasks();
+      }
     } catch (error) {
       alert("Network Error: Could not delete task.");
     }

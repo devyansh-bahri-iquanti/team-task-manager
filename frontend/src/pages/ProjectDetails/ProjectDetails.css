@@ -31,3 +31,13 @@
   display: flex;
   justify-content: space-between;
 }
+
+/* If the screen is smaller than 768px (Mobile/Tablet), stack columns vertically */
+@media (max-width: 768px) {
+  .kanban-board {
+    flex-direction: column;
+  }
+  .kanban-column {
+    min-height: auto;
+  }
+}

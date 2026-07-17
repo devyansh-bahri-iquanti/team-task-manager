@@ -17,6 +17,8 @@ const TaskForm = () => {
     assigned_to: "",
   });
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     fetchUsers();
     if (taskId) fetchTaskData(); // Pre-fill the form if editing
@@ -29,7 +31,7 @@ const TaskForm = () => {
       });
       if (res.ok) setUsers(await res.json());
     } catch (error) {
-      console.error("Network error fetching users");
+      console.error("Network error fetching users:", error);
     }
   };
 
@@ -69,6 +71,7 @@ const TaskForm = () => {
       });
 
       if (res.ok) {
+        alert("Success! Task saved.");
         navigate(`/projects/${payload.project}`);
       } else {
         const err = await res.json();

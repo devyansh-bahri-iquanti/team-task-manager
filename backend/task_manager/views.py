@@ -9,6 +9,7 @@ from .serializers import UserSerializer, RegisterSerializer, ProjectSerializer, 
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from .models import Project, Task, Comment
+from django.db.models import Q
 
 # Day 1: Health Check
 @api_view(['GET'])
@@ -61,7 +62,10 @@ class ProjectListCreate(APIView):
 
     def get(self, request):
         try:
-            projects = Project.objects.filter(owner=request.user)
+            # FIX: Show projects they own OR projects where they are assigned a task
+            projects = Project.objects.filter(
+                Q(owner=request.user) | Q(tasks__assigned_to=request.user)
+            ).distinct()
             serializer = ProjectSerializer(projects, many=True)
             return Response(serializer.data)
         except Exception as e:
@@ -83,7 +87,11 @@ class ProjectDetail(APIView):
     def get(self, request, pk):
         try:
             project = Project.objects.get(pk=pk)
-            if project.owner != request.user:
+            # FIX: Allow viewing if they own it OR if they have an assigned task in it
+            is_owner = project.owner == request.user
+            has_task = project.tasks.filter(assigned_to=request.user).exists()
+            
+            if not is_owner and not has_task:
                 return Response({"error": "Unauthorized to view this project"}, status=status.HTTP_403_FORBIDDEN)
             
             serializer = ProjectSerializer(project)
@@ -106,7 +114,6 @@ class ProjectDetail(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
-# Day 4
 class UserList(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
@@ -125,11 +132,15 @@ class TaskListCreate(APIView):
             project_id = request.query_params.get('project')
             if project_id:
                 project = Project.objects.get(pk=project_id)
-                if project.owner != request.user:
+                # FIX: Verify they have access to the project
+                if project.owner != request.user and not project.tasks.filter(assigned_to=request.user).exists():
                     return Response({"error": "Unauthorized"}, status=status.HTTP_403_FORBIDDEN)
                 tasks = Task.objects.filter(project_id=project_id)
             else:
-                tasks = Task.objects.filter(project__owner=request.user)
+                # FIX: Show tasks they created OR tasks assigned to them
+                tasks = Task.objects.filter(
+                    Q(project__owner=request.user) | Q(assigned_to=request.user) | Q(created_by=request.user)
+                ).distinct()
             serializer = TaskSerializer(tasks, many=True)
             return Response(serializer.data)
         except Project.DoesNotExist:
@@ -153,7 +164,6 @@ class TaskDetail(APIView):
     def get(self, request, pk):
         try:
             task = Task.objects.get(pk=pk)
-            # FIX: Ensure only authorized people can view the task details
             if task.project.owner != request.user and task.created_by != request.user and task.assigned_to != request.user:
                 return Response({"error": "Unauthorized"}, status=status.HTTP_403_FORBIDDEN)
             return Response(TaskSerializer(task).data)
@@ -175,7 +185,6 @@ class TaskDetail(APIView):
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Task.DoesNotExist:
-            # FIX: Add missing DoesNotExist check
             return Response({"error": "Task not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -193,7 +202,6 @@ class TaskDetail(APIView):
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Task.DoesNotExist:
-            # FIX: Add missing DoesNotExist check
             return Response({"error": "Task not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -208,7 +216,6 @@ class TaskDetail(APIView):
             task.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Task.DoesNotExist:
-            # FIX: Add missing DoesNotExist check
             return Response({"error": "Task not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -240,17 +247,15 @@ class DashboardStats(APIView):
 
     def get(self, request):
         try:
-            # 1. Count projects owned by the user
-            projects = Project.objects.filter(owner=request.user)
+            # FIX: Advanced filtering so assigned tasks show up on Dashboard!
+            projects = Project.objects.filter(Q(owner=request.user) | Q(tasks__assigned_to=request.user)).distinct()
             total_projects = projects.count()
 
-            # 2. Count tasks belonging to those projects
-            tasks = Task.objects.filter(project__owner=request.user)
+            tasks = Task.objects.filter(Q(project__owner=request.user) | Q(assigned_to=request.user) | Q(created_by=request.user)).distinct()
             total_tasks = tasks.count()
             completed_tasks = tasks.filter(status='Completed').count()
             pending_tasks = total_tasks - completed_tasks
 
-            # 3. Return the formatted data
             return Response({
                 "total_projects": total_projects,
                 "total_tasks": total_tasks,

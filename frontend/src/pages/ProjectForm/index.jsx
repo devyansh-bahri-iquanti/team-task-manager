@@ -22,6 +22,7 @@ const ProjectForm = () => {
       });
 
       if (response.ok) {
+        alert("Success! Project created.");
         navigate("/projects");
       } else {
         const errorData = await response.json();

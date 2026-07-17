@@ -125,7 +125,11 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-CORS_ALLOW_ALL_ORIGINS = True # For development only
+# SECURITY FIX: Only allowing the specific React frontend to communicate with Django
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
 
 # DRF Settings
 REST_FRAMEWORK = {

@@ -1,0 +1,30 @@
+.project-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.project-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.project-card {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.delete-btn {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}

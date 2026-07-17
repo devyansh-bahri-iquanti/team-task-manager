@@ -15,6 +15,7 @@ import ProjectForm from "./pages/ProjectForm";
 import ProjectDetails from "./pages/ProjectDetails";
 import TaskForm from "./pages/TaskForm";
 import TaskDetails from "./pages/TaskDetails";
+import Navbar from "./components/Navbar";
 
 const PrivateRoute = ({ children }) => {
   const { token } = useContext(AuthContext);
@@ -25,6 +26,7 @@ function App() {
   return (
     <Router>
       <AuthProvider>
+        <Navbar />
         <Routes>
           {/* Protected Routes */}
           <Route
